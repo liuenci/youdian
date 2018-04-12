@@ -63,7 +63,7 @@ public class UserServiceImpl implements IUserService{
                 }
             }
             if (Const.EMAIL.equals(type)){
-                int resultCount = userMapper.checkUsername(str);
+                int resultCount = userMapper.checkEmail(str);
                 if (resultCount > 0) {
                     return ServerResponse.createByErrorMessage("email已存在");
                 }
@@ -167,6 +167,15 @@ public class UserServiceImpl implements IUserService{
             return ServerResponse.createByErrorMessage("找不到当前用户");
         }
         user.setPassword(StringUtils.EMPTY);
+        System.out.println("name:"+user.getUsername());
         return ServerResponse.createBySuccess(user);
+    }
+
+    // backend
+    public ServerResponse checkAdminRole(User user){
+        if (user != null && user.getRole().intValue() == Const.Role.ROLE_ADMIN){
+            return ServerResponse.createBySuccess();
+        }
+        return ServerResponse.createByError();
     }
 }

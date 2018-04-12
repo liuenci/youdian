@@ -90,7 +90,7 @@ public class UserController {
      * @param username
      * @return
      */
-    @RequestMapping(value = "forget_get_question.do",method = RequestMethod.GET)
+    @RequestMapping(value = "forget_get_question.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> forgetGetQuestion(String username){
         return iUserService.selectQuestion(username);
@@ -103,7 +103,7 @@ public class UserController {
      * @param answer
      * @return
      */
-    @RequestMapping(value = "forget_check_answer.do",method = RequestMethod.GET)
+    @RequestMapping(value = "forget_check_answer.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> forgetCheckAnswer(String username,String question,String answer){
         return iUserService.checkAnswer(username,question,answer);
@@ -116,7 +116,7 @@ public class UserController {
      * @param forgetToken
      * @return
      */
-    @RequestMapping(value = "forget_reset_password.do",method = RequestMethod.GET)
+    @RequestMapping(value = "forget_reset_password.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> forgetResetPassword(String username,String passwordNew,String forgetToken){
         return iUserService.forgetResetPassword(username,passwordNew,forgetToken);
@@ -173,6 +173,7 @@ public class UserController {
         if (currentUser == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"未登录，需要强制登录status=10");
         }
+        System.out.println("看看");
         return iUserService.getInformation(currentUser.getId());
     }
 }
