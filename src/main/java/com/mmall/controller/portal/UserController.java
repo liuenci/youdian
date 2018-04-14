@@ -173,7 +173,6 @@ public class UserController {
         if (currentUser == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"未登录，需要强制登录status=10");
         }
-        System.out.println("看看");
         return iUserService.getInformation(currentUser.getId());
     }
 }
