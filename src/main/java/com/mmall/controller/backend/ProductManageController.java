@@ -35,16 +35,17 @@ public class ProductManageController {
             return ServerResponse.createByErrorMessage("无权限操作");
         }
     }
+
     @RequestMapping("set_sale_status.do")
     @ResponseBody
-    public ServerResponse setSaleStatus(HttpSession session, Integer productId,Integer status) {
+    public ServerResponse setSaleStatus(HttpSession session, Integer productId, Integer status) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
         if (user == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，需登录管理员");
         }
         if (iUserService.checkAdminRole(user).isSuccess()) {
             // 填充我们产品的业务逻辑
-            return iProductService.setSaleStatus(productId,status);
+            return iProductService.setSaleStatus(productId, status);
         } else {
             return ServerResponse.createByErrorMessage("无权限操作");
         }
@@ -67,14 +68,27 @@ public class ProductManageController {
 
     @RequestMapping("list.do")
     @ResponseBody
-    public ServerResponse getList(HttpSession session, @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,@RequestParam(value = "pageSize",defaultValue = "10")int pageSize) {
+    public ServerResponse getList(HttpSession session, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum, @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
         if (user == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，需登录管理员");
         }
         if (iUserService.checkAdminRole(user).isSuccess()) {
             // 填充我们产品的业务逻辑
-            return iProductService.getProductList(pageNum,pageSize);
+            return iProductService.getProductList(pageNum, pageSize);
+        } else {
+            return ServerResponse.createByErrorMessage("无权限操作");
+        }
+    }
+    @RequestMapping("search.do")
+    @ResponseBody
+    public ServerResponse productSearch(HttpSession session, String productName, Integer productId, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum, @RequestParam(value = "pageSize", defaultValue = "1") int pageSize) {
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，请联系管理员");
+        }
+        if (iUserService.checkAdminRole(user).isSuccess()) {
+            return iProductService.searchProduct(productName,productId,pageNum,pageSize);
         } else {
             return ServerResponse.createByErrorMessage("无权限操作");
         }
