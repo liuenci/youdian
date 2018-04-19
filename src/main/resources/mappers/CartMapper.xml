@@ -151,4 +151,7 @@
       and product_id = #{productId}
     </if>
   </update>
+  <select id="selectCartProductCount" parameterType="int" resultType="int">
+    SELECT IFNULL(sum(quantity),0) as count from mmall_cart where user_id = #{userId}
+  </select>
 </mapper>

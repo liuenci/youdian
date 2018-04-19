@@ -141,4 +141,11 @@ public class CartServiceImpl implements ICartService {
         cartMapper.checkedOrUncheckedProduct(userId,productId,checked);
         return this.list(userId);
     }
+
+    public ServerResponse<Integer> getCartProductCount(Integer userId){
+        if (userId == null){
+            return ServerResponse.createBySuccess(0);
+        }
+        return ServerResponse.createBySuccess(cartMapper.selectCartProductCount(userId));
+    }
 }
