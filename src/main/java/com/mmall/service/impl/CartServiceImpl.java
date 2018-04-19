@@ -136,4 +136,9 @@ public class CartServiceImpl implements ICartService {
         cartMapper.deleteByUserIdProductIds(userId,productList);
         return this.list(userId);
     }
+
+    public ServerResponse<CartVo> selectOrUnSelect(Integer userId,Integer productId,Integer checked){
+        cartMapper.checkedOrUncheckedProduct(userId,productId,checked);
+        return this.list(userId);
+    }
 }
