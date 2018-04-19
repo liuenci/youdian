@@ -76,6 +76,16 @@ public class CartController {
         if (user == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
-        return iCartService.selectOrUnSelect(user.getId(),null,Const.Cart.UN_CHECKED);
+        return iCartService.selectOrUnSelect(user.getId(), null, Const.Cart.UN_CHECKED);
+    }
+
+    @RequestMapping("select.do")
+    @ResponseBody
+    public ServerResponse<CartVo> select(HttpSession session, Integer productId) {
+        User user = (User)session.getAttribute(Const.CURRENT_USER);
+        if (user == null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
+        return iCartService.selectOrUnSelect(user.getId(),productId,Const.Cart.CHECKED);
     }
 }
