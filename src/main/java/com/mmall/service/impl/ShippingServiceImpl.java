@@ -1,5 +1,7 @@
 package com.mmall.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.mmall.common.ServerResponse;
 import com.mmall.dao.ShippingMapper;
@@ -8,6 +10,7 @@ import com.mmall.service.IShippingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 @Service("iShippingService")
@@ -49,5 +52,12 @@ public class ShippingServiceImpl implements IShippingService{
             return ServerResponse.createByErrorMessage("无法查询到该地址");
         }
         return ServerResponse.createBySuccess("更新地址成功",shipping);
+    }
+
+    public ServerResponse<PageInfo> list(int pageNum,int pageSize,int userId){
+        PageHelper.startPage(pageNum,pageSize);
+        List<Shipping> shippingList = shippingMapper.selectByUserId(userId);
+        PageInfo pageInfo = new PageInfo(shippingList);
+        return ServerResponse.createBySuccess(pageInfo);
     }
 }
