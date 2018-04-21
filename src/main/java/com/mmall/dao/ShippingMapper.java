@@ -1,6 +1,7 @@
 package com.mmall.dao;
 
 import com.mmall.pojo.Shipping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 public interface ShippingMapper {
     int deleteByPrimaryKey(Integer id);
@@ -14,4 +15,10 @@ public interface ShippingMapper {
     int updateByPrimaryKeySelective(Shipping record);
 
     int updateByPrimaryKey(Shipping record);
+
+    int deleteByShippingIdUserId(@RequestParam("userId") Integer userId, @RequestParam("shippingId") Integer shippingId);
+
+    int updateByShipping(Shipping recond);
+
+    Shipping selectByShippingIdUserId(@RequestParam("userId") Integer userId,@RequestParam("shippingId") Integer shippingId);
 }
