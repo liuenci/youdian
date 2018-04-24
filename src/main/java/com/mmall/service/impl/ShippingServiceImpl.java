@@ -51,7 +51,7 @@ public class ShippingServiceImpl implements IShippingService{
         if (shipping == null){
             return ServerResponse.createByErrorMessage("无法查询到该地址");
         }
-        return ServerResponse.createBySuccess("更新地址成功",shipping);
+        return ServerResponse.createBySuccess("查询地址成功",shipping);
     }
 
     public ServerResponse<PageInfo> list(int pageNum,int pageSize,int userId){
