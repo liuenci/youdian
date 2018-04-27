@@ -28,6 +28,16 @@ public class OrderController {
     @Autowired
     private IOrderService iOrderService;
 
+    @RequestMapping("create.do")
+    @ResponseBody
+    public ServerResponse create(HttpSession session, Integer shippingId) {
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
+        return iOrderService.createOrder(user.getId(),shippingId);
+    }
+
     @RequestMapping("pay.do")
     @ResponseBody
     public ServerResponse pay(HttpSession session, Long orderNo, HttpServletRequest request) {
@@ -39,7 +49,7 @@ public class OrderController {
         return iOrderService.pay(orderNo, user.getId(), path);
     }
 
-    @RequestMapping("alipy_callback.do")
+    @RequestMapping("alipay_callback.do")
     @ResponseBody
     public Object alipayCallback(HttpServletRequest request) {
         Map<String, String> params = Maps.newHashMap();
@@ -57,17 +67,17 @@ public class OrderController {
         // 非常重要,验证回调的正确性,是不是支付宝发的，而且还要避免重复通知
         params.remove("sign_type");
         try {
-            boolean alipayRSACheckedV2 = AlipaySignature.rsaCheckV2(params, Configs.getAlipayPublicKey(),"utf-8",Configs.getSignType());
+            boolean alipayRSACheckedV2 = AlipaySignature.rsaCheckV2(params, Configs.getAlipayPublicKey(), "utf-8", Configs.getSignType());
 
-            if (!alipayRSACheckedV2){
+            if (!alipayRSACheckedV2) {
                 return ServerResponse.createByErrorMessage("非法请求,验证不通过");
             }
         } catch (AlipayApiException e) {
-            logger.error("支付宝验证回调异常",e);
+            logger.error("支付宝验证回调异常", e);
         }
         //todo 验证数据
         ServerResponse serverResponse = iOrderService.aliCallback(params);
-        if (serverResponse.isSuccess()){
+        if (serverResponse.isSuccess()) {
             return Const.AlipayCallback.RESPONSE_SUCCESS;
         }
         return Const.AlipayCallback.RESPONSE_FAILED;
@@ -80,8 +90,8 @@ public class OrderController {
         if (user == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
-        ServerResponse serverResponse = iOrderService.queryOrderPayStatus(user.getId(),orderNo);
-        if (serverResponse.isSuccess()){
+        ServerResponse serverResponse = iOrderService.queryOrderPayStatus(user.getId(), orderNo);
+        if (serverResponse.isSuccess()) {
             return ServerResponse.createBySuccess(true);
         }
         return ServerResponse.createBySuccess(false);
