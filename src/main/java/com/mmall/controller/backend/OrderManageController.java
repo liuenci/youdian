@@ -61,7 +61,7 @@ public class OrderManageController {
 
     @RequestMapping("search.do")
     @ResponseBody
-    public ServerResponse<OrderVo> search(HttpSession session, Long orderNo) {
+    public ServerResponse<OrderVo> orderSearch(HttpSession session, Long orderNo) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
         if (user == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
@@ -73,4 +73,19 @@ public class OrderManageController {
             return ServerResponse.createByErrorMessage("无权限操作");
         }
     }
+    @RequestMapping("send_goods.do")
+    @ResponseBody
+    public ServerResponse<String> orderSendGoods(HttpSession session, Long orderNo) {
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
+        if (iUserService.checkAdminRole(user).isSuccess()) {
+            // 填充订单的业务逻辑
+            return iOrderService.manageSendGoods(orderNo);
+        } else {
+            return ServerResponse.createByErrorMessage("无权限操作");
+        }
+    }
+
 }

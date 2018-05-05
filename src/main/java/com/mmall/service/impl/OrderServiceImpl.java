@@ -522,4 +522,18 @@ public class OrderServiceImpl implements IOrderService {
         }
         return ServerResponse.createByErrorMessage("订单不存在");
     }
+
+    public ServerResponse<String> manageSendGoods(Long orderNo){
+        Order order = orderMapper.selectByOrderNo(orderNo);
+        if (order != null){
+            if (order != null){
+                if (order.getStatus() == Const.OrderStatusEnum.PAID.getCode()){
+                    order.setStatus(Const.OrderStatusEnum.SHIPPED.getCode());
+                    orderMapper.updateByPrimaryKeySelective(order);
+                    return ServerResponse.createBySuccess("发货成功");
+                }
+            }
+        }
+        return ServerResponse.createByErrorMessage("订单不存在");
+    }
 }
