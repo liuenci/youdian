@@ -122,12 +122,12 @@ public class OrderServiceImpl implements IOrderService {
         // 检验购物车的数据,包括产品的状态和数量
         for (Cart cartItem : cartList) {
             OrderItem orderItem = new OrderItem();
-            Product product = productMapper.selectByPrimaryKey(orderItem.getProductId());
+            Product product = productMapper.selectByPrimaryKey(cartItem.getProductId());
             if (Const.ProductStatusEnum.ON_SALE.getCode() != product.getStatus()) {
                 return ServerResponse.createByErrorMessage("产品" + product.getName() + "不是在线售卖状态");
             }
             // 检验库存
-            if (cartItem.getQuantity() > product.getStatus()) {
+            if (cartItem.getQuantity() > product.getStock()) {
                 return ServerResponse.createByErrorMessage("产品" + product.getName() + "库存不足");
             }
             orderItem.setUserId(userId);
