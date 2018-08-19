@@ -10,7 +10,6 @@ import com.mmall.util.MD5Util;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.security.krb5.internal.PAData;
 
 import java.util.UUID;
 
@@ -19,6 +18,12 @@ public class UserServiceImpl implements IUserService{
     @Autowired
     private UserMapper userMapper;
 
+    /**
+     * 用户登录
+     * @param username
+     * @param password
+     * @return
+     */
     @Override
     public ServerResponse<User> login(String username, String password) {
         int resultCount = userMapper.checkUsername(username);
@@ -34,11 +39,19 @@ public class UserServiceImpl implements IUserService{
         return ServerResponse.createBySuccess("登录成功",user);
     }
 
+    /**
+     * 用户注册
+     * @param user
+     * @return
+     */
+    @Override
     public ServerResponse<String> register(User user){
+        // 先检验用户名是否被注册
         ServerResponse validResponse = this.checkValid(user.getUsername(),Const.USERNAME);
         if (!validResponse.isSuccess()){
             return validResponse;
         }
+        // 再检验邮箱是否被注册
         validResponse = this.checkValid(user.getEmail(),Const.EMAIL);
         if (!validResponse.isSuccess()){
             return validResponse;
@@ -53,6 +66,12 @@ public class UserServiceImpl implements IUserService{
         return ServerResponse.createBySuccessMessage("注册成功");
     }
 
+    /**
+     * 检查用户名和邮箱是否可用
+     * @param str
+     * @param type
+     * @return
+     */
     public ServerResponse<String> checkValid(String str,String type){
         if (StringUtils.isNotBlank(type)){
             // 开始校验
@@ -74,6 +93,11 @@ public class UserServiceImpl implements IUserService{
         return ServerResponse.createBySuccessMessage("校验成功");
     }
 
+    /**
+     * 根据用户名查找用户设置的问题
+     * @param username
+     * @return
+     */
     public ServerResponse selectQuestion(String username){
         ServerResponse validResponse = this.checkValid(username,Const.USERNAME);
         if (validResponse.isSuccess()){
@@ -87,6 +111,13 @@ public class UserServiceImpl implements IUserService{
         return ServerResponse.createByErrorMessage("找回密码的问题是空的");
     }
 
+    /**
+     * 检查用户答案
+     * @param username
+     * @param question
+     * @param answer
+     * @return
+     */
     public ServerResponse<String> checkAnswer(String username,String question,String answer){
         int resultCount = userMapper.checkAnswer(username,question,answer);
         if (resultCount > 0){
@@ -98,6 +129,13 @@ public class UserServiceImpl implements IUserService{
         return ServerResponse.createByErrorMessage("问题的答案错误");
     }
 
+    /**
+     * 忘记密码的充值密码
+     * @param username
+     * @param passwordNew
+     * @param forgetToken
+     * @return
+     */
     public ServerResponse<String> forgetResetPassword(String username,String passwordNew,String forgetToken){
         if (StringUtils.isBlank(forgetToken)){
             return ServerResponse.createByErrorMessage("参数错误，token需要传递");

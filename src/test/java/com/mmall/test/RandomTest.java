@@ -7,10 +7,10 @@ import java.util.Random;
 
 public class RandomTest {
     @Test
-    public void testRandom(){
+    public void testRandom() {
         StringBuffer stringBuffer = new StringBuffer();
         Random random = new Random();
-        for (int i = 0; i < 5; i++){
+        for (int i = 0; i < 5; i++) {
             stringBuffer.append(random.nextInt(10));// [0,10)
             System.out.println(random.nextBoolean());
         }
@@ -18,5 +18,10 @@ public class RandomTest {
 
         // 断言
         Assert.assertTrue(true);
+    }
+
+    @Test
+    public void testT() {
+        System.out.println(2017 % 7);
     }
 }
