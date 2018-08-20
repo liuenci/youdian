@@ -6,9 +6,8 @@ import com.mmall.common.ServerResponse;
 import com.mmall.dao.CategoryMapper;
 import com.mmall.pojo.Category;
 import com.mmall.service.ICategoryService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -17,10 +16,11 @@ import java.util.List;
 import java.util.Set;
 
 @Service("iCategoryService")
+@Slf4j
 public class CategoryServiceImpl implements ICategoryService {
     @Autowired
     private CategoryMapper categoryMapper;
-    private Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
+
     public ServerResponse addCategory(String categoryName, Integer parentId) {
         if (parentId == null || StringUtils.isBlank(categoryName)) {
             return ServerResponse.createByErrorMessage("添加品类参数错误");
@@ -56,26 +56,27 @@ public class CategoryServiceImpl implements ICategoryService {
         return ServerResponse.createByErrorMessage("更新品类名字失败");
     }
 
-    public ServerResponse<List<Category>> getChildrenParallelCategory(Integer categoryId){
+    public ServerResponse<List<Category>> getChildrenParallelCategory(Integer categoryId) {
         List<Category> categoryList = categoryMapper.selectCategoryChildrenByParentId(categoryId);
-        if (CollectionUtils.isEmpty(categoryList)){
-            logger.info("未找到当前分类的子分类");
+        if (CollectionUtils.isEmpty(categoryList)) {
+            log.info("未找到当前分类的子分类");
         }
         return ServerResponse.createBySuccess(categoryList);
     }
 
     /**
      * 递归查询本节点的id及孩子节点的id
+     *
      * @param categoryId
      * @return
      */
-    public ServerResponse selectCategoryAndChildrenById(Integer categoryId){
+    public ServerResponse selectCategoryAndChildrenById(Integer categoryId) {
         Set<Category> categorySet = Sets.newHashSet();
-        findChildCategory(categorySet,categoryId);
+        findChildCategory(categorySet, categoryId);
 
         List<Integer> categoryIdList = Lists.newArrayList();
         if (categoryIdList != null) {
-            for (Category categoryItem : categorySet){
+            for (Category categoryItem : categorySet) {
                 categoryIdList.add(categoryItem.getId());
             }
         }
@@ -84,20 +85,21 @@ public class CategoryServiceImpl implements ICategoryService {
 
     /**
      * 递归算法，算出子节点
+     *
      * @param categorySet
      * @param categoryId
      * @return
      */
-    private Set<Category> findChildCategory(Set<Category> categorySet, Integer categoryId){
+    private Set<Category> findChildCategory(Set<Category> categorySet, Integer categoryId) {
         // 找到当前节点
         Category category = categoryMapper.selectByPrimaryKey(categoryId);
-        if (category != null){
+        if (category != null) {
             categorySet.add(category);
         }
         // 查找子节点，递归算法一定要有一个退出的条件
         List<Category> categoryList = categoryMapper.selectCategoryChildrenByParentId(categoryId);
-        for (Category categoryItem:categoryList){
-            findChildCategory(categorySet,categoryItem.getId());
+        for (Category categoryItem : categoryList) {
+            findChildCategory(categorySet, categoryItem.getId());
         }
         return categorySet;
     }
