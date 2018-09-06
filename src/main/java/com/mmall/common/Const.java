@@ -10,11 +10,12 @@ public class Const {
     public static final String EMAIL = "email";
 
     public static final String USERNAME = "username";
+    public static final String TOKEN_PREFIX = "token_";
 
     /**
      * 设置 redis 缓存时间
      */
-    public interface RedisCacheExtime{
+    public interface RedisCacheExtime {
         int REDIS_SESSION_EXTIME = 60 * 30; // 30 分钟
     }
 
@@ -78,9 +79,9 @@ public class Const {
             return code;
         }
 
-        public static OrderStatusEnum codeOf(int code){
-            for (OrderStatusEnum orderStatusEnum : values()){
-                if(orderStatusEnum.getCode() == code){
+        public static OrderStatusEnum codeOf(int code) {
+            for (OrderStatusEnum orderStatusEnum : values()) {
+                if (orderStatusEnum.getCode() == code) {
                     return orderStatusEnum;
                 }
             }
@@ -133,9 +134,9 @@ public class Const {
             return value;
         }
 
-        public static PaymentTypeEnum codeOf(int code){
-            for (PaymentTypeEnum paymentTypeEnum : values()){
-                if (paymentTypeEnum.getCode() == code){
+        public static PaymentTypeEnum codeOf(int code) {
+            for (PaymentTypeEnum paymentTypeEnum : values()) {
+                if (paymentTypeEnum.getCode() == code) {
                     return paymentTypeEnum;
                 }
             }
