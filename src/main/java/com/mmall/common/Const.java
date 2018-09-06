@@ -11,6 +11,13 @@ public class Const {
 
     public static final String USERNAME = "username";
 
+    /**
+     * 设置 redis 缓存时间
+     */
+    public interface RedisCacheExtime{
+        int REDIS_SESSION_EXTIME = 60 * 30; // 30 分钟
+    }
+
     public interface Role {
         int ROLE_CUSTOMER = 0;
         int ROLE_ADMIN = 1;
