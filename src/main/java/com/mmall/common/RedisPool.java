@@ -14,8 +14,8 @@ public class RedisPool {
     private static Boolean testOnBorrow = Boolean.parseBoolean(PropertiesUtil.getProperty("redis.test.borrow", "true"));
     private static Boolean testOnReturn = Boolean.parseBoolean(PropertiesUtil.getProperty("redis.test.return", "true"));
 
-    private static String redisIp = PropertiesUtil.getProperty("redis.ip");
-    private static Integer redisPort = Integer.parseInt(PropertiesUtil.getProperty("redis.port"));
+    private static String redisIp = PropertiesUtil.getProperty("redis2.ip");
+    private static Integer redisPort = Integer.parseInt(PropertiesUtil.getProperty("redis2.port"));
 
     private static void initPool() {
         JedisPoolConfig config = new JedisPoolConfig();
@@ -35,21 +35,21 @@ public class RedisPool {
         initPool();
     }
 
-    public static Jedis getJedis(){
+    public static Jedis getJedis() {
         return pool.getResource();
     }
 
-    public static void returnBrokenResource(Jedis jedis){
+    public static void returnBrokenResource(Jedis jedis) {
         pool.returnBrokenResource(jedis);
     }
 
-    public static void returnResource(Jedis jedis){
+    public static void returnResource(Jedis jedis) {
         pool.returnResource(jedis);
     }
 
     public static void main(String[] args) {
         Jedis jedis = pool.getResource();
-        jedis.set("cierkey","ciervalue");
+        jedis.set("cierkey", "ciervalue");
         returnResource(jedis);
 
         pool.destroy(); // 临时调用，销毁连接池中的所有连接
