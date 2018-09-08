@@ -187,7 +187,7 @@ public class ProductManageController {
 
     @RequestMapping("richtext_img_upload.do")
     @ResponseBody
-    public Map upload(HttpServletRequest httpServletRequest, @RequestParam(value = "upload_file",required = false)MultipartFile file, HttpServletRequest request,HttpServletResponse response) {
+    public Map richtextImgUpload(HttpServletRequest httpServletRequest, @RequestParam(value = "upload_file",required = false)MultipartFile file, HttpServletRequest request,HttpServletResponse response) {
         Map resultMap = Maps.newHashMap();
 //        User user = (User) session.getAttribute(Const.CURRENT_USER);
 //        String loginToken = CookieUtil.readLoginToken(httpServletRequest);

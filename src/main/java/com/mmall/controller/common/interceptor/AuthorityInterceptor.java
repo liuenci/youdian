@@ -30,7 +30,6 @@ public class AuthorityInterceptor implements HandlerInterceptor {
         HandlerMethod handlerMethod = (HandlerMethod)handler;
 
         //解析HandlerMethod
-
         String methodName = handlerMethod.getMethod().getName();
         String className = handlerMethod.getBean().getClass().getSimpleName();
 
@@ -99,10 +98,8 @@ public class AuthorityInterceptor implements HandlerInterceptor {
                 }
             }
             out.flush();
-            out.close();//geelynote 这里要关闭
-
+            out.close();//这里要关闭
             return false;
-
         }
         return true;
     }
