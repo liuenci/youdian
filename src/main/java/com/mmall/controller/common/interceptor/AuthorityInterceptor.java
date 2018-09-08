@@ -24,80 +24,85 @@ import java.util.Map;
 
 public class AuthorityInterceptor implements HandlerInterceptor {
     @Override
-    public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         log.info("preHandle");
-        // 请求中 Controller 中的方法名
-        HandlerMethod handlerMethod = (HandlerMethod) o;
+        //请求中Controller中的方法名
+        HandlerMethod handlerMethod = (HandlerMethod)handler;
 
-        // 解析 HandlerMethod
+        //解析HandlerMethod
+
         String methodName = handlerMethod.getMethod().getName();
         String className = handlerMethod.getBean().getClass().getSimpleName();
 
-        // 解析参数，具体的参数 key 以及 value 是什么
+        //解析参数,具体的参数key以及value是什么，我们打印日志
         StringBuffer requestParamBuffer = new StringBuffer();
-        Map paramMap = httpServletRequest.getParameterMap();
+        Map paramMap = request.getParameterMap();
         Iterator it = paramMap.entrySet().iterator();
+        while (it.hasNext()){
+            Map.Entry entry = (Map.Entry)it.next();
+            String mapKey = (String)entry.getKey();
 
-        while (it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
-            String mapKey = (String) entry.getKey();
             String mapValue = StringUtils.EMPTY;
 
-            // request 这个参数的 map，里面的 value 返回的是一个 String[]
+            //request这个参数的map，里面的value返回的是一个String[]
             Object obj = entry.getValue();
-            if (obj instanceof String[]) {
-                String[] strs = (String[]) obj;
+            if(obj instanceof String[]){
+                String[] strs = (String[])obj;
                 mapValue = Arrays.toString(strs);
             }
             requestParamBuffer.append(mapKey).append("=").append(mapValue);
         }
 
-        if (StringUtils.equals(className, "UserManageController") && StringUtils.equals(methodName, "login")) {
-            log.info("权限拦截器拦截到请求，className:{},methodName:{}", className, methodName);
-            // 如果是拦截到登录请求，不打印参数，因为参数里面有密码，全部打印到日志中，防止日志泄露。
+        if(StringUtils.equals(className,"UserManageController") && StringUtils.equals(methodName,"login")){
+            log.info("权限拦截器拦截到请求,className:{},methodName:{}",className,methodName);
+            //如果是拦截到登录请求，不打印参数，因为参数里面有密码，全部会打印到日志中，防止日志泄露
             return true;
         }
-        log.info("权限拦截器拦截到请求，className:{},methodName:{},param:{}", className, methodName, requestParamBuffer.toString());
+
+        log.info("权限拦截器拦截到请求,className:{},methodName:{},param:{}",className,methodName,requestParamBuffer.toString());
+
 
         User user = null;
-        String loginToken = CookieUtil.readLoginToken(httpServletRequest);
-        if (StringUtils.isNotEmpty(loginToken)) {
+
+        String loginToken = CookieUtil.readLoginToken(request);
+        if(StringUtils.isNotEmpty(loginToken)){
             String userJsonStr = RedisShardedPoolUtil.get(loginToken);
-            user = JsonUtil.string2Obj(userJsonStr, User.class);
+            user = JsonUtil.string2Obj(userJsonStr,User.class);
         }
 
-        if (user == null || (user.getRole().intValue() != Const.Role.ROLE_ADMIN)) {
-            // 返回 false ,即不会调用 Controller 里的方法
-            httpServletResponse.reset();
-            httpServletResponse.setCharacterEncoding("UTF-8");
-            httpServletResponse.setContentType("application/json;charset=UTF-8");
+        if(user == null || (user.getRole().intValue() != Const.Role.ROLE_ADMIN)){
+            //返回false.即不会调用controller里的方法
+            response.reset();//geelynote 这里要添加reset，否则报异常 getWriter() has already been called for this response.
+            response.setCharacterEncoding("UTF-8");//geelynote 这里要设置编码，否则会乱码
+            response.setContentType("application/json;charset=UTF-8");//geelynote 这里要设置返回值的类型，因为全部是json接口。
 
-            PrintWriter out = httpServletResponse.getWriter();
+            PrintWriter out = response.getWriter();
 
-            // 上传由于富文本的空间要求，要特殊处理返回值，这里面区分是否登录以及是否有权限
-            if (user == null) {
-                if (StringUtils.equals(className, "ProductManageController") && StringUtils.equals(methodName, "richtextImgUpload")) {
+            //上传由于富文本的控件要求，要特殊处理返回值，这里面区分是否登录以及是否有权限
+            if(user == null){
+                if(StringUtils.equals(className,"ProductManageController") && StringUtils.equals(methodName,"richtextImgUpload")){
                     Map resultMap = Maps.newHashMap();
-                    resultMap.put("success", false);
-                    resultMap.put("msg", "请登录管理员");
-                    out.print(JsonUtil.obj2String(resultMap));
-                } else {
-                    out.print(JsonUtil.obj2String(ServerResponse.createByErrorMessage("拦截器拦截，用户未登录")));
-                }
-            } else {
-                if (StringUtils.equals(className,"ProductManageController") && StringUtils.equals(methodName,"richtextUpload")){
-                    Map resultMap = Maps.newHashMap();
-                    resultMap.put("success", false);
-                    resultMap.put("msg", "无权限操作");
+                    resultMap.put("success",false);
+                    resultMap.put("msg","请登录管理员");
                     out.print(JsonUtil.obj2String(resultMap));
                 }else{
-                    out.print(JsonUtil.obj2String(ServerResponse.createByErrorMessage("拦截器拦截，用户无权限操作")));
+                    out.print(JsonUtil.obj2String(ServerResponse.createByErrorMessage("拦截器拦截,用户未登录")));
+                }
+            }else{
+                if(StringUtils.equals(className,"ProductManageController") && StringUtils.equals(methodName,"richtextImgUpload")){
+                    Map resultMap = Maps.newHashMap();
+                    resultMap.put("success",false);
+                    resultMap.put("msg","无权限操作");
+                    out.print(JsonUtil.obj2String(resultMap));
+                }else{
+                    out.print(JsonUtil.obj2String(ServerResponse.createByErrorMessage("拦截器拦截,用户无权限操作")));
                 }
             }
             out.flush();
-            out.close();
+            out.close();//geelynote 这里要关闭
 
             return false;
+
         }
         return true;
     }
